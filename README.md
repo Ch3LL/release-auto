@@ -1,0 +1,2 @@
+# release-auto
+automate releases
