@@ -60,6 +60,8 @@ rm -rf ${REPO_NAME}
 git clone git@github.com:${GH_USER}/${REPO_NAME}.git -o ${GH_USER}|| exit 1
 cd ${REPO_DIR}
 git remote add upstream https://github.com/saltstack/${REPO_NAME}.git || exit 1
+git fetch upstream
+git rebase upstream/develop
 
 # Check if there are any unstaged changes
 if [ -n "$(git status --porcelain)" ]; then
@@ -70,12 +72,14 @@ fi
 
 UPSTREAM_BR="stable"
 DOWNSTREAM_BR="develop"
+RAN_NAME=$(cat /dev/random | tr -dc "[:alpha:]" | head -c 3)
+MERGE_BRANCH=merge-${UPSTREAM_BR}_${RAN_NAME}
 
 # Checkout the branch we're merging forward to
-git checkout ${UPSTREAM_BR}
+git checkout upstream/${UPSTREAM_BR}
 
 # Create a new merge branch and check it out
-git checkout -b merge-${UPSTREAM_BR}
+git checkout -b ${MERGE_BRANCH}
 
 # Reset the branch to upstream repo, just in case.
 git reset --hard upstream/${UPSTREAM_BR}
@@ -94,5 +98,5 @@ git merge ${DOWNSTREAM_BR} -m "$TOP_LINE_MSG" --no-commit
 RET_CODE=$?
 if [ ${RET_CODE} -eq 0 ]; then
     git commit -m "$TOP_LINE_MSG" -m "No conflicts."
-    git push ${GH_USER} merge-${UPSTREAM_BR}
+    git push ${GH_USER} ${MERGE_BRANCH}
 fi
