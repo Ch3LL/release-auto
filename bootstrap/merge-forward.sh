@@ -10,6 +10,8 @@
 #=============================================================================================
 
 # Display usage/help text
+# Thanks to rallytime: https://github.com/rallytime for this script.
+
 usage() {
 cat << EOF
 usage: $0 options
